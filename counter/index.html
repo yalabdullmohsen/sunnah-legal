@@ -58,7 +58,7 @@ body{margin:0;background:#f4f8fb}@media (prefers-color-scheme:dark){body{backgro
   <div class="card"><h2><i style="background:var(--c-pink)"></i>الجنس</h2><p class="note">عدد الطلبات</p><div id="gender"></div></div>
   <div class="card wide"><h2><i style="background:var(--c-orange)"></i>نتائج المتابعة</h2><p class="note" id="fnote">حالات المتابعة مع المستفيدين · أعداد فقط</p><div id="followup"></div></div>
  </div>
- <div class="foot">تُحدَّث الأرقام تلقائيًا مرتين يوميًا: ٩ ص و٧ م (أيام الدوام)</div>
+ <div class="foot">تُحدَّث الأرقام تلقائيًا</div>
 </div>
 <script>
 (function(){
@@ -97,7 +97,13 @@ function render(rows){
     ['religion','nationality','language','gender','followup'].forEach(g=>{const a=by(g);if(!a.length)return;if(g==='followup'){const s=a.reduce((t,x)=>t+x.n,0),tot=one('status','total');document.getElementById('fnote').textContent='حالات المتابعة مع المستفيدين ('+s+' حالة) · أعداد فقط';if(tot>s)a.push({label:'لم يتم التواصل',n:tot-s});}hbar(g,a,Math.max(...a.map(x=>x.n),1));});
   }
 }
-function load(){fetch('stats.json?'+Date.now()).then(r=>r.json()).then(j=>{render(j.rows);if(j.asof)document.getElementById('asof').textContent=j.asof}).catch(()=>{});}
+const SB='https://nybuospfwbbtejvjivhd.supabase.co',AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55YnVvc3Bmd2JidGVqdmppdmhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNTM2NzUsImV4cCI6MjEwNzkyOTY3NX0.raSv5v4repFqwam7C7l0d5mWABVH44REq_oRfDYzgF4';
+function load(){fetch('stats.json?'+Date.now()).then(r=>r.json()).then(j=>{render(j.rows);if(j.asof)document.getElementById('asof').textContent=j.asof;
+ fetch(SB+'/rest/v1/rpc/counter_rows',{method:'POST',headers:{apikey:AK,authorization:'Bearer '+AK,'content-type':'application/json'},body:'{}'}).then(r=>r.json()).then(live=>{
+  if(!Array.isArray(live))return;const tot=(live.find(x=>x.group==='status'&&x.label==='total')||{}).n;if(!tot)return;
+  render(live.concat(j.rows.filter(x=>x.group==='followup')));
+  document.getElementById('asof').textContent='يتحدّث تلقائيًا · '+new Date().toLocaleString('ar-KW',{weekday:'long',day:'numeric',month:'long',hour:'numeric',hour12:true,timeZone:'Asia/Kuwait'});
+ }).catch(()=>{});}).catch(()=>{});}
 load();setInterval(load,600000);
 })();
 </script></body></html>
