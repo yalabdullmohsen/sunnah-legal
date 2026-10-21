@@ -1,5 +1,7 @@
 // ==UserScript==
 // @name         عدّاد علمني الإسلام
+// @namespace    wq-counter
+// @version      2
 // @match        https://eservices-cp.awqaf.gov.kw/RequestedServices/ReceivedForms*
 // @grant        none
 // @run-at       document-idle
@@ -23,4 +25,7 @@ const docs=rows.filter(r=>cache[r.requestServiceId]).map(r=>({id:r.requestServic
 const res=await fetch(EP,{method:'POST',headers:{'content-type':'application/json','x-key':KEY},body:JSON.stringify({docs,exclude:EXCL})});
 return'sent '+docs.length+' fresh '+fresh+' '+res.status;
 })();
-setTimeout(()=>__run().catch(()=>{}),4000);setInterval(()=>{try{jQuery('[data-role=grid]').first().data('kendoGrid').dataSource.read()}catch(e){};setTimeout(()=>__run().catch(()=>{}),4000)},600000);
+let __t;const __go=(d)=>{clearTimeout(__t);__t=setTimeout(()=>__run().catch(()=>{}),d)};
+__go(4000);
+// بلا استطلاع دوري: يعمل عند فتح الصفحة، وعند أي تغيير حالة تحفظه أنت (SaveStatus)
+try{jQuery(document).ajaxComplete((e,x,o)=>{if(/SaveStatus/.test(o.url||''))__go(6000)})}catch(e){}

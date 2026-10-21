@@ -104,6 +104,6 @@ function load(){fetch('stats.json?'+Date.now()).then(r=>r.json()).then(j=>{rende
   render(live.concat(j.rows.filter(x=>x.group==='followup')));
   document.getElementById('asof').textContent='يتحدّث تلقائيًا · '+new Date().toLocaleString('ar-KW',{weekday:'long',day:'numeric',month:'long',hour:'numeric',hour12:true,timeZone:'Asia/Kuwait'});
  }).catch(()=>{});}).catch(()=>{});}
-load();setInterval(load,600000);
+load();document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 })();
 </script></body></html>
