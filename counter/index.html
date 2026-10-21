@@ -39,6 +39,7 @@ body{margin:0;background:#f4f8fb}@media (prefers-color-scheme:dark){body{backgro
 .q .row .t{height:14px;background:var(--c-track);border-radius:7px;overflow:hidden;direction:ltr}
 .q .row .f{height:100%;border-radius:7px}
 .q .row .n{font-variant-numeric:tabular-nums;font-weight:var(--cds-font-weight-medium);direction:ltr;text-align:left}
+.q .wide{grid-column:1/-1}
 .q .foot{color:var(--c-mute);font-size:var(--cds-font-size-caption);text-align:center;padding:4px 0 2px}
 </style></head><body>
 <div class="q" dir="rtl">
@@ -54,6 +55,7 @@ body{margin:0;background:#f4f8fb}@media (prefers-color-scheme:dark){body{backgro
   <div class="card"><h2><i style="background:var(--c-g2)"></i>الجنسية</h2><p class="note">عدد الطلبات لكل جنسية</p><div id="nationality"></div></div>
   <div class="card"><h2><i style="background:var(--c-indigo)"></i>اللغة المفضّلة</h2><p class="note">اللغة الأولى، وإن لم تُحدَّد فالثانية</p><div id="language"></div></div>
   <div class="card"><h2><i style="background:var(--c-pink)"></i>الجنس</h2><p class="note">عدد الطلبات</p><div id="gender"></div></div>
+  <div class="card wide"><h2><i style="background:var(--c-orange)"></i>نتائج المتابعة</h2><p class="note">حالات المتابعة مع المستفيدين (٦٣ حالة) · أعداد فقط</p><div id="followup"></div></div>
  </div>
  <div class="foot">تُحدَّث الأرقام تلقائيًا مرتين يوميًا: ٩ ص و٧ م (أيام الدوام)</div>
 </div>
@@ -61,7 +63,7 @@ body{margin:0;background:#f4f8fb}@media (prefers-color-scheme:dark){body{backgro
 (function(){
 const wd=d=>new Date(d+'T00:00:00Z').toLocaleDateString('ar-u-nu-latn',{weekday:'long',day:'numeric',timeZone:'UTC'});
 const V=n=>'var(--c-'+n+')';
-const COL={religion:{'مسيحية':V('blue'),'إسلام':V('g2'),'هندوسية':V('orange'),'بوذية':V('amber'),'أخرى/غير محدد':V('gray')},gender:{'أنثى':V('pink'),'ذكر':V('blue')}};
+const COL={religion:{'مسيحية':V('blue'),'إسلام':V('g2'),'هندوسية':V('orange'),'بوذية':V('amber'),'أخرى/غير محدد':V('gray')},gender:{'أنثى':V('pink'),'ذكر':V('blue')},followup:{'جارٍ التواصل':V('blue'),'لم يتم الرد':V('orange'),'غير راغب بالتعرف':V('pink'),'قيد التفكير':V('indigo'),'طلب تعلّم لمسلم':V('teal'),'بانتظار الكفيل':V('amber'),'رغبة في الإشهار':V('g2'),'تم الإشهار':V('g1')}};
 const FALL={nationality:[V('g2'),V('teal')],language:[V('indigo'),V('blue')]};
 let animated=false;
 function countUp(el,to){
@@ -91,7 +93,7 @@ function render(rows){
       const b=document.createElement('div');b.className='b';b.style.height=Math.max(4,x.n/mx*150)+'px';
       const d=document.createElement('span');d.className='d';d.textContent=wd(x.label);
       c.append(v,b,d);dEl.appendChild(c);});
-    ['religion','nationality','language','gender'].forEach(g=>{const a=by(g);hbar(g,a,Math.max(...a.map(x=>x.n),1));});
+    ['religion','nationality','language','gender','followup'].forEach(g=>{const a=by(g);if(!a.length)return;hbar(g,a,Math.max(...a.map(x=>x.n),1));});
   }
 }
 function load(){fetch('stats.json?'+Date.now()).then(r=>r.json()).then(j=>{render(j.rows);if(j.asof)document.getElementById('asof').textContent=j.asof}).catch(()=>{});}
