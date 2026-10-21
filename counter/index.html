@@ -68,9 +68,10 @@ const COL={religion:{'مسيحية':V('blue'),'إسلام':V('g2'),'هندوسي
 const FALL={nationality:[V('g2'),V('teal')],language:[V('indigo'),V('blue')]};
 let animated=false;
 function countUp(el,to){
+  el._to=to;
   if(animated||window.matchMedia('(prefers-reduced-motion: reduce)').matches||to<1){el.textContent=String(to);animated=true;return;}
   animated=true;const t0=performance.now(),dur=1400;
-  (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=String(Math.round(to*e));if(p<1)requestAnimationFrame(step);else el.textContent=String(to);})(t0);
+  (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=String(Math.round(el._to*e));if(p<1)requestAnimationFrame(step);else el.textContent=String(el._to);})(t0);
 }
 function hbar(id,rows,max){
   const box=document.getElementById(id);box.replaceChildren();
