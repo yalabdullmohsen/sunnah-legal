@@ -46,7 +46,8 @@ body{margin:0;background:#f4f8fb}@media (prefers-color-scheme:dark){body{backgro
  <header><h1>عدّاد طلبات «علمني الإسلام»</h1><p class="sub">وزارة الشؤون الإسلامية | إدارة العلاقات الخارجية | مراقبة الجاليات والتعريف بالإسلام | قسم التعريف بالإسلام · بيانات مجمّعة بلا أسماء</p></header>
  <div class="card hero"><span class="lbl">إجمالي الطلبات الواردة</span><span class="big dash-skeleton" id="big">0</span><span class="sub" id="asof">آخر تحديث: الأربعاء ٢١ أكتوبر ٢٠٢٦ · ١١ ص</span></div>
  <div class="tiles">
-  <div class="card tile t-ok"><b id="t1">—</b><span>تم تحويلها إلى «جاري الدراسة»</span></div>
+  <div class="card tile t-ok"><b id="t1">—</b><span>جاري الدراسة</span></div>
+  <div class="card tile t-ok"><b id="t3">—</b><span>تم الإنجاز</span></div>
   <div class="card tile t-new"><b id="t2">—</b><span>طلبات جديدة لم تُحوَّل بعد</span></div>
  </div>
  <div class="card"><h2><i style="background:var(--c-teal)"></i>الطلبات حسب اليوم</h2><p class="note">من ١٣ إلى ٢١ أكتوبر ٢٠٢٦ · اليوم الأعلى بالأصفر</p><div class="days dash-skeleton" id="days"></div></div>
@@ -85,7 +86,7 @@ function render(rows){
     const by=g=>rows.filter(x=>x.group===g).sort((a,b)=>a.ord-b.ord),one=(g,l)=>(rows.find(x=>x.group===g&&x.label===l)||{n:0}).n;
     const big=document.getElementById('big');big.classList.remove('dash-skeleton');countUp(big,one('status','total'));
     document.getElementById('t1').textContent=String(one('status','studying'));
-    document.getElementById('t2').textContent=String(one('status','new'));
+    document.getElementById('t2').textContent=String(one('status','new'));document.getElementById('t3').textContent=String(one('status','done'));
     const days=by('day'),mx=Math.max(...days.map(x=>x.n),1);
     const dEl=document.getElementById('days');dEl.classList.remove('dash-skeleton');dEl.replaceChildren();
     days.forEach(x=>{const c=document.createElement('div');c.className='col'+(x.n===mx?' top':'');
