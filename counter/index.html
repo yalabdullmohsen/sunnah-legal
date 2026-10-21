@@ -58,7 +58,6 @@ body{margin:0;background:#f4f8fb}@media (prefers-color-scheme:dark){body{backgro
   <div class="card"><h2><i style="background:var(--c-pink)"></i>الجنس</h2><p class="note">عدد الطلبات</p><div id="gender"></div></div>
   <div class="card wide"><h2><i style="background:var(--c-orange)"></i>نتائج المتابعة</h2><p class="note" id="fnote">حالات المتابعة مع المستفيدين · أعداد فقط</p><div id="followup"></div></div>
  </div>
- <div class="foot">تُحدَّث الأرقام تلقائيًا</div>
 </div>
 <script>
 (function(){
@@ -103,7 +102,7 @@ function load(){fetch('stats.json?'+Date.now()).then(r=>r.json()).then(j=>{rende
  fetch(SB+'/rest/v1/rpc/counter_rows',{method:'POST',headers:{apikey:AK,authorization:'Bearer '+AK,'content-type':'application/json'},body:'{}'}).then(r=>r.json()).then(live=>{
   if(!Array.isArray(live))return;const tot=(live.find(x=>x.group==='status'&&x.label==='total')||{}).n;if(!tot)return;
   render(live.concat(j.rows.filter(x=>x.group==='followup')));
-  document.getElementById('asof').textContent='يتحدّث تلقائيًا · '+new Date().toLocaleString('ar-KW',{weekday:'long',day:'numeric',month:'long',hour:'numeric',hour12:true,timeZone:'Asia/Kuwait'});
+  document.getElementById('asof').textContent='آخر تحديث: '+new Date().toLocaleString('ar-KW',{weekday:'long',day:'numeric',month:'long',hour:'numeric',hour12:true,timeZone:'Asia/Kuwait'});
  }).catch(()=>{});}).catch(()=>{});}
 load();document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 })();
