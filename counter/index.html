@@ -66,44 +66,48 @@ const V=n=>'var(--c-'+n+')';
 const COL={religion:{'مسيحية':V('blue'),'إسلام':V('g2'),'هندوسية':V('orange'),'بوذية':V('amber'),'أخرى/غير محدد':V('gray')},gender:{'أنثى':V('pink'),'ذكر':V('blue')},followup:{'جارٍ التواصل':V('blue'),'لم يتم الرد':V('orange'),'غير راغب بالتعرف':V('pink'),'قيد التفكير':V('indigo'),'طلب تعلّم لمسلم':V('teal'),'بانتظار الكفيل':V('amber'),'رغبة في الإشهار':V('g2'),'تم الإشهار':V('g1'),'طلب تجريبي':V('gray'),'لم يتم التواصل':V('gray')}};
 const FALL={nationality:[V('g2'),V('teal')],language:[V('indigo'),V('blue')]};
 let animated=false;
-function countUp(el,to){
+let first=true;
+function countUp(el,to,dur){
   el._to=to;
-  if(animated||window.matchMedia('(prefers-reduced-motion: reduce)').matches||to<1){el.textContent=String(to);animated=true;return;}
-  animated=true;const t0=performance.now(),dur=1400;
+  if(!first||window.matchMedia('(prefers-reduced-motion: reduce)').matches||to<1){el.textContent=String(to);return;}
+  dur=dur||1400;const t0=performance.now();el.textContent='0';
   (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=String(Math.round(el._to*e));if(p<1)requestAnimationFrame(step);else el.textContent=String(el._to);})(t0);
 }
 function hbar(id,rows,max){
   const box=document.getElementById(id);box.replaceChildren();
   rows.forEach((r,i)=>{const row=document.createElement('div');row.className='row';
     const l=document.createElement('span');l.textContent=r.label;
-    const t=document.createElement('div');t.className='t';const f=document.createElement('div');f.className='f';f.style.width=(r.n/max*100)+'%';
+    const t=document.createElement('div');t.className='t';const f=document.createElement('div');f.className='f';if(first){f.style.width='0%';f.style.transition='width 1.4s cubic-bezier(.2,.7,.2,1)';requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.width=(r.n/max*100)+'%'}))}else f.style.width=(r.n/max*100)+'%';
     f.style.background=(COL[id]&&COL[id][r.label])||FALL[id][i<3?0:1];t.appendChild(f);
-    const n=document.createElement('span');n.className='n';n.textContent=String(r.n);
+    const n=document.createElement('span');n.className='n';countUp(n,r.n);
     row.append(l,t,n);box.appendChild(row);});
 }
 function render(rows){
   {
     const by=g=>rows.filter(x=>x.group===g).sort((a,b)=>a.ord-b.ord),one=(g,l)=>(rows.find(x=>x.group===g&&x.label===l)||{n:0}).n;
     const big=document.getElementById('big');big.classList.remove('dash-skeleton');countUp(big,one('status','total'));
-    document.getElementById('t1').textContent=String(one('status','studying'));
-    document.getElementById('t2').textContent=String(one('status','new'));document.getElementById('t3').textContent=String(one('status','done'));
+    countUp(document.getElementById('t1'),one('status','studying'));
+    countUp(document.getElementById('t2'),one('status','new'));countUp(document.getElementById('t3'),one('status','done'));
     const days=by('day'),mx=Math.max(...days.map(x=>x.n),1);
     const dEl=document.getElementById('days');dEl.classList.remove('dash-skeleton');dEl.replaceChildren();
     days.forEach(x=>{const c=document.createElement('div');c.className='col'+(x.n===mx?' top':'');
-      const v=document.createElement('span');v.className='v';v.textContent=String(x.n);
-      const b=document.createElement('div');b.className='b';b.style.height=Math.max(4,x.n/mx*150)+'px';
+      const v=document.createElement('span');v.className='v';countUp(v,x.n);
+      const b=document.createElement('div');b.className='b';if(first){b.style.height='4px';b.style.transition='height 1.4s cubic-bezier(.2,.7,.2,1)';requestAnimationFrame(()=>requestAnimationFrame(()=>{b.style.height=Math.max(4,x.n/mx*150)+'px'}))}else b.style.height=Math.max(4,x.n/mx*150)+'px';
       const d=document.createElement('span');d.className='d';d.textContent=wd(x.label);
       c.append(v,b,d);dEl.appendChild(c);});
     ['religion','nationality','language','gender','followup'].forEach(g=>{const a=by(g);if(!a.length)return;if(g==='followup'){const s=a.reduce((t,x)=>t+x.n,0),tot=one('status','total');document.getElementById('fnote').textContent='حالات المتابعة مع المستفيدين ('+s+' حالة) · أعداد فقط';if(tot>s)a.push({label:'لم يتم التواصل',n:tot-s});}hbar(g,a,Math.max(...a.map(x=>x.n),1));});
   }
 }
 const SB='https://nybuospfwbbtejvjivhd.supabase.co',AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55YnVvc3Bmd2JidGVqdmppdmhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNTM2NzUsImV4cCI6MjEwNzkyOTY3NX0.raSv5v4repFqwam7C7l0d5mWABVH44REq_oRfDYzgF4';
-function load(){fetch('stats.json?'+Date.now()).then(r=>r.json()).then(j=>{render(j.rows);if(j.asof)document.getElementById('asof').textContent=j.asof;
- fetch(SB+'/rest/v1/rpc/counter_rows',{method:'POST',headers:{apikey:AK,authorization:'Bearer '+AK,'content-type':'application/json'},body:'{}'}).then(r=>r.json()).then(live=>{
-  if(!Array.isArray(live))return;const tot=(live.find(x=>x.group==='status'&&x.label==='total')||{}).n;if(!tot)return;
-  render(live.concat(j.rows.filter(x=>x.group==='followup')));
-  document.getElementById('asof').textContent='آخر تحديث: '+new Date().toLocaleString('ar-KW',{weekday:'long',day:'numeric',month:'long',hour:'numeric',hour12:true,timeZone:'Asia/Kuwait'});
- }).catch(()=>{});}).catch(()=>{});}
+function load(){
+ const base=fetch('stats.json?'+Date.now()).then(r=>r.json());
+ const live=fetch(SB+'/rest/v1/rpc/counter_rows',{method:'POST',headers:{apikey:AK,authorization:'Bearer '+AK,'content-type':'application/json'},body:'{}'}).then(r=>r.json()).catch(()=>null);
+ Promise.all([base,live]).then(([j,l])=>{
+  const ok=Array.isArray(l)&&((l.find(x=>x.group==='status'&&x.label==='total')||{}).n>0);
+  const rows=ok?l.concat(j.rows.filter(x=>x.group==='followup')):j.rows;
+  render(rows);first=false;
+  document.getElementById('asof').textContent=ok?'آخر تحديث: '+new Date().toLocaleString('ar-KW',{weekday:'long',day:'numeric',month:'long',hour:'numeric',hour12:true,timeZone:'Asia/Kuwait'}):(j.asof||'');
+ }).catch(()=>{});}
 load();document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 })();
 </script></body></html>
