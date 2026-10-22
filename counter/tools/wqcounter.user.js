@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         عدّاد علمني الإسلام
 // @namespace    wq-counter
-// @version      2
+// @version      3
+// @updateURL    https://yalabdullmohsen.github.io/sunnah-legal/counter/tools/wqcounter.user.js
+// @downloadURL  https://yalabdullmohsen.github.io/sunnah-legal/counter/tools/wqcounter.user.js
 // @match        https://eservices-cp.awqaf.gov.kw/RequestedServices/ReceivedForms*
 // @grant        none
 // @run-at       document-idle
@@ -9,10 +11,10 @@
 const __run=()=>(async()=>{
 const EP='https://nybuospfwbbtejvjivhd.supabase.co/functions/v1/counter-ingest',KEY='353f5968f8e3a988be42f1b940e0ea0a5eeb856b',EXCL=[2];
 const ld=u=>new Promise((res,rej)=>{if(document.querySelector('script[src="'+u+'"]'))return res();const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
-const rel=t=>{t=(t||'').toLowerCase();if(/مسيح|نصران|christ|catholic|كاثول/.test(t))return'مسيحية';if(/مسلم|إسلام|اسلام|islam|muslim/.test(t))return'إسلام';if(/هندو|hindu/.test(t))return'هندوسية';if(/بوذ|buddh/.test(t))return'بوذية';return'أخرى/غير محدد'};
+const rel=t=>{t=(t||'').toLowerCase();if(/غير\s*مسلم|كاف[ر]/.test(t))return'أخرى/غير محدد';const h=[];if(/مسيح|مسح|نصران|christ|catholic|كاثول|كرست/.test(t))h.push('مسيحية');if(/مسلم|اسلم|إسلام|اسلام|islam|muslim/.test(t))h.push('إسلام');if(/هندو|هنود|hindu|اندو/.test(t))h.push('هندوسية');if(/بوذ|buddh/.test(t))h.push('بوذية');return h.length===1?h[0]:'أخرى/غير محدد'};
 const nat=t=>{t=t||'';if(/فل[يى]بين|فلبين|phil/i.test(t))return'الفلبين';if(/نيبال|nepal/i.test(t))return'النيبال';if(/سيلان|سريلانك|sri/i.test(t))return'سريلانكا';if(/بنج?لاديش|بنغلاديش|bangla/i.test(t))return'بنجلاديش';if(/[إأا]ثيوب|ethiop/i.test(t))return'إثيوبيا';if(/[إأا]ر[يت]+ر|eritr/i.test(t))return'إريتريا';if(/أوكران|اوكران|ukrain/i.test(t))return'أوكرانيا';if(/بنين|benin/i.test(t))return'بنين';if(/هند|india/i.test(t))return'الهند';return t||'غير محدد'};
 const L1={hindi:'الهندية',tagalog:'التاغالوغ',filipino:'التاغالوغ',tamil:'التاميلية',nepali:'النيبالية',sinhala:'السنهالية',sinhalese:'السنهالية',english:'الإنجليزية',urdu:'الأردية',bengali:'البنغالية',bangla:'البنغالية',amharic:'الأمهرية',arabic:'العربية',russian:'الروسية',malayalam:'المالايالامية',oromo:'الأورومية',french:'الفرنسية',telugu:'التيلوغوية'};
-const L2=[[/روس/,'الروسية'],[/عرب/,'العربية'],[/مل[يا]لم|ملايالم/,'المالايالامية'],[/[أا]مار|[أا]مهر/,'الأمهرية'],[/فرنس/,'الفرنسية'],[/telugu|تيلوغ/i,'التيلوغوية'],[/نيبال/,'النيبالية'],[/سيلان|سنهال|سيريلانك|سريلانك/,'السنهالية'],[/أمهر|امهر/,'الأمهرية'],[/ارومو|أورومو|اورومو/,'الأورومية'],[/هند/,'الهندية'],[/تامل|تميل/,'التاميلية'],[/اردو|أردو/,'الأردية'],[/بنغال|بنجال/,'البنغالية'],[/تاغالوغ|تاجالوج|فلبين|فليبين/,'التاغالوغ']];
+const L2=[[/روس/,'الروسية'],[/عرب/,'العربية'],[/مل[يا]+لم/,'المالايالامية'],[/[أا]مار|[أا]مهر/,'الأمهرية'],[/فرنس/,'الفرنسية'],[/telugu|تيلوغ|تلغ/i,'التيلوغوية'],[/نيبال/,'النيبالية'],[/سيلان|سبلان|سنهال|سيريلانك|سريلانك/,'السنهالية'],[/أمهر|امهر/,'الأمهرية'],[/ارومو|أورومو|اورومو/,'الأورومية'],[/هند/,'الهندية'],[/تامل|تميل/,'التاميلية'],[/اردو|أردو/,'الأردية'],[/بنغال|بنجال/,'البنغالية'],[/تاغالوغ|تاجالوج|فلبين|فليبين/,'التاغالوغ']];
 const lang=(a,b)=>{const k=(a||'').trim().toLowerCase();if(k&&k!=='other')return L1[k]||a;for(const[r,v]of L2)if(r.test(b||''))return v;return'غير محددة'};
 await ld('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 const g=jQuery('[data-role=grid]').first().data('kendoGrid');if(!g)return'nogrid';
